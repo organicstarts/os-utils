@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon -r babel-register server.js",
+    "start": "env-cmd -f ./config/dev.env nodemon -r babel-register server.js",
     "build": "babel . --ignore node_modules,build --out-dir build",
     "start:prod": "node build/server.js"
   },
@@ -19,7 +19,9 @@
     "babel-register": "^6.26.0",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "mongodb": "^3.3.0-beta2",
+    "mongoose": "^5.6.6"
   },
   "devDependencies": {
     "env-cmd": "^9.0.3",

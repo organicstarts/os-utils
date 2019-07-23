@@ -1,5 +1,6 @@
 import bodyParser from "body-parser";
 import express from "express";
+require("./db/mongoose");
 const cors = require("cors");
 const app = express();
 const router = express.Router();
