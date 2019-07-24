@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const questionSchema = new mongoose.Schema(
+const answerSchema = new mongoose.Schema(
   {
     content: {
       type: String,
@@ -16,22 +16,27 @@ const questionSchema = new mongoose.Schema(
       of: Number,
       default: {}
     },
-    product: {
+    name: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    email: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    questionID: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
-      ref: "Product"
+      ref: "Question"
     }
   },
   {
     timestamps: true
   }
 );
-questionSchema.virtual("answers", {
-  ref: "Answer",
-  localField: "_id",
-  foreignField: "answer"
-});
 
-const Question = mongoose.model("Question", questionSchema);
+const Answer = mongoose.model("Answer", answerSchema);
 
-module.exports = Question;
+module.exports = Answer;
