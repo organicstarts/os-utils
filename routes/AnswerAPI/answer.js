@@ -2,14 +2,17 @@ const router = require("express").Router();
 const Answer = require("../../models/answer");
 const Question = require("../../models/question");
 const auth = require("../../middleware/auth");
-
+const profanities = require("google-profanity-words");
 /*-------------------------------------------------------------------
                             POST REQUEST                            
 ---------------------------------------------------------------------*/
 router.post("/answer", async (req, res) => {
+  let reg = new RegExp(profanities.list().join("|"), "gi");
+  const aContent = req.body.content.replace(reg, "****");
   let mapKey = `thumbVote.${req.body.email.replace(/[^\w\s]/g, "")}`;
+  
   const answer = new Answer({
-    content: req.body.content,
+    content: aContent,
     questionID: req.body.questionID,
     name: req.body.name,
     email: req.body.email,

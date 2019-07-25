@@ -1,0 +1,48 @@
+<!--SAMPLE HTML SITE FOR TESTING PURPOSES ONLY-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="questions" class="container"></div>
+
+    <script
+      src="https://code.jquery.com/jquery-3.4.1.min.js"
+      integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+      crossorigin="anonymous"
+    ></script>
+    <script type="text/javascript">
+      $(document).ready(() => {
+        $.get("http://localhost:3001/question/all/123?limit=0")
+          .then(async e => {
+            let answer = await Promise.all(
+              e.questions.map(async data => {
+                data.answers = await $.get(
+                  `http://localhost:3001/answer/all/${data._id}`
+                ).then(e => {
+                  return e;
+                });
+              })
+            );
+            return e;
+          })
+          .then(a => appendData(a.questions));
+      });
+
+      function appendData(data) {
+        data.forEach(element => {
+          $("#questions").append(
+            `<ul id=${element._id}><h2>${element.content}</h2></ul>`
+          );
+          element.answers.forEach(e => {
+            $(`#${element._id}`).append(`<li>${e.content}</li>`);
+          });
+        });
+      }
+    </script>
+  </body>
+</html>
