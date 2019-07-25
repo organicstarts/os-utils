@@ -71,7 +71,7 @@ router.get("/question/all/:productID", async (req, res) => {
                             UPDATE REQUEST                            
 ---------------------------------------------------------------------*/
 router.patch("/question/vote", async (req, res) => {
-  let number = req.body.vote;
+  let number = parseInt(req.body.vote);
   let mapKey = req.body.email.replace(/[^\w\s]/g, "");
   try {
     const question = await Question.findById(req.body.id);
@@ -96,6 +96,7 @@ router.patch("/question/vote", async (req, res) => {
       if (number === 2) question.points -= 1;
     }
     await question.save();
+
     res.status(200).send(question);
   } catch (e) {
     res.status(500).send();

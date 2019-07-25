@@ -5,10 +5,33 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
     <title>Document</title>
   </head>
   <body>
-    <div id="questions" class="container"></div>
+    <div id="questions" class="container">
+      <button id="ask-question">Ask a Question</button>
+
+      <form id="question-form" class="d-none">
+        <div class="form-group">
+          <label for="question">Question</label>
+          <textarea
+            type="text"
+            id="form-content"
+            class="form-control"
+            id="name"
+            placeholder="John D."
+          ></textarea>
+        </div>
+
+        <button type="submit" class="btn-primary">Submit</button>
+      </form>
+    </div>
 
     <script
       src="https://code.jquery.com/jquery-3.4.1.min.js"
@@ -16,6 +39,47 @@
       crossorigin="anonymous"
     ></script>
     <script type="text/javascript">
+      $("#ask-question").click(function() {
+        $("#question-form").removeClass("d-none");
+      });
+
+      $("#question-form").submit(async function(e) {
+        let content = $("#form-content").val();
+
+        await $.ajax({
+          url: "http://localhost:3001/question",
+          method: "POST",
+          data: {
+            email: "johnd@dmail.com",
+            name: "john d.",
+            productID: "123",
+            content: content
+          },
+          success: function(x) {
+            console.log(x);
+          }
+        });
+        e.preventDefault();
+      });
+
+      $(document).on("click", ".btn", async function() {
+        let id = $(this).data("objid");
+        let count = $(this).data("count");
+
+        await $.ajax({
+          url: "http://localhost:3001/question/vote",
+          method: "PATCH",
+          data: {
+            vote: count,
+            email: "yvan@organicstart.com",
+            id: id
+          },
+          success: function(x) {
+            $(`#${id} .points`).html(x.points);
+          }
+        });
+      });
+
       $(document).ready(() => {
         $.get("http://localhost:3001/question/all/123?limit=0")
           .then(async e => {
@@ -36,10 +100,30 @@
       function appendData(data) {
         data.forEach(element => {
           $("#questions").append(
-            `<ul id=${element._id}><h2>${element.content}</h2></ul>`
+            `<div id=${element._id} class="row p-2">
+              <div class="col-2 text-center"><button class="btn" data-count=1 data-objid=${
+                element._id
+              }>Up</button><div class="points">${
+              element.points
+            }</div><button class="btn" data-count=2 data-objID=${
+              element._id
+            }>Down</button></div>
+                <div class="col-10">
+                  <div class="row">
+                    <div class="col-2">QUESTION</div>
+                    <div class="col-10"><h2>${element.content}</h2></div>
+                  </div>
+                  <div class="row">
+                    <div class="col-2">ANSWER</div>
+                    <div class="col-10 answers"></div>
+                  </div>
+                </div>
+            </div>`
           );
           element.answers.forEach(e => {
-            $(`#${element._id}`).append(`<li>${e.content}</li>`);
+            $(`#${element._id} .answers`).append(
+              `<div class="my-2">${e.content} <br/> By:${e.name}</div>`
+            );
           });
         });
       }
