@@ -54,7 +54,8 @@ router.get("/question/all/:productID", async (req, res) => {
       .sort({ createdAt: -1 })
       .limit(limit)
       .skip(skip);
-    if (!questions) {
+
+    if (!questions.length) {
       res.status(401).send();
     }
     const questionsObj = {

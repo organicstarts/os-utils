@@ -32,7 +32,9 @@
         <button type="submit" class="btn-primary">Submit</button>
       </form>
     </div>
-
+    <div class="container text-center">
+      <a class="load-more d-none">See more questions...</a>
+    </div>
     <script
       src="https://code.jquery.com/jquery-3.4.1.min.js"
       integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
@@ -41,6 +43,10 @@
     <script type="text/javascript">
       $("#ask-question").click(function() {
         $("#question-form").removeClass("d-none");
+      });
+
+      $(document).on("click", ".answer-question", function() {
+        $("#answer-form").toggleClass("d-none");
       });
 
       $("#question-form").submit(async function(e) {
@@ -62,6 +68,25 @@
         e.preventDefault();
       });
 
+      $(`#answer-form`).submit(function(e) {
+        e.preventDefault();
+        alert("HI!");
+        // let content = $("#form-answer").val();
+        // await $.ajax({
+        //   url: "http://localhost:3001/question",
+        //   method: "POST",
+        //   data: {
+        //     email: "johnd@dmail.com",
+        //     name: "john d.",
+        //     productID: "123",
+        //     content: content
+        //   },
+        //   success: function(x) {
+        //     console.log(x);
+        //   }
+        // });
+      });
+
       $(document).on("click", ".btn", async function() {
         let id = $(this).data("objid");
         let count = $(this).data("count");
@@ -80,8 +105,14 @@
         });
       });
 
-      $(document).ready(() => {
-        $.get("http://localhost:3001/question/all/123?limit=0")
+      let count = 0;
+      $(".load-more").click(() => {
+        getQuestions(123, count);
+        count++;
+      });
+
+      function getQuestions(product, i) {
+        $.get(`http://localhost:3001/question/all/${product}?limit=5&skip=${i}`)
           .then(async e => {
             let answer = await Promise.all(
               e.questions.map(async data => {
@@ -94,7 +125,18 @@
             );
             return e;
           })
-          .then(a => appendData(a.questions));
+          .then(a => {
+            appendData(a.questions);
+            $(".load-more").removeClass("d-none");
+          })
+          .catch(e => {
+            $(".load-more").addClass("d-none");
+          });
+      }
+
+      $(document).ready(() => {
+        getQuestions(123, count);
+        count++;
       });
 
       function appendData(data) {
@@ -111,7 +153,10 @@
                 <div class="col-10">
                   <div class="row">
                     <div class="col-2">QUESTION</div>
-                    <div class="col-10"><h2>${element.content}</h2></div>
+                    <div class="col-10"><h2>${element.content}</h2>
+                      <small class="float-right answer-question">answer this question</small>
+                      </div>
+                    
                   </div>
                   <div class="row">
                     <div class="col-2">ANSWER</div>
