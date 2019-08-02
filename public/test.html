@@ -11,10 +11,19 @@
       integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
       crossorigin="anonymous"
     />
+    <link
+      rel="stylesheet"
+      href="https://alert.organicstart.com/release/main.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.9.0/css/all.css"
+    />
+
     <title>Document</title>
   </head>
   <body>
-    <div id="questions" class="container">
+    <div id="questions" class="container ui segment m-5">
       <button id="ask-question">Ask a Question</button>
 
       <form id="question-form" class="d-none">
@@ -33,7 +42,7 @@
       </form>
     </div>
     <div class="container text-center">
-      <a class="load-more d-none">See more questions...</a>
+      <button class="load-more">See more questions...</button>
     </div>
     <script
       src="https://code.jquery.com/jquery-3.4.1.min.js"
@@ -46,7 +55,9 @@
       });
 
       $(document).on("click", ".answer-question", function() {
-        $("#answer-form").toggleClass("d-none");
+        $(this)
+          .find("form")
+          .removeClass("d-none");
       });
 
       $("#question-form").submit(async function(e) {
@@ -68,23 +79,26 @@
         e.preventDefault();
       });
 
-      $(`#answer-form`).submit(function(e) {
+      $(document).on("click", ".form-sub", async function(e) {
+        var id = $(this).data("id");
+
+        let content = $(`#${id}`)
+          .find("textarea")
+          .val();
+        await $.ajax({
+          url: "http://localhost:3001/answer",
+          method: "POST",
+          data: {
+            email: "johnd@dmail.com",
+            name: "john d.",
+            questionID: id,
+            content: content
+          },
+          success: function(x) {
+            location.reload();
+          }
+        });
         e.preventDefault();
-        alert("HI!");
-        // let content = $("#form-answer").val();
-        // await $.ajax({
-        //   url: "http://localhost:3001/question",
-        //   method: "POST",
-        //   data: {
-        //     email: "johnd@dmail.com",
-        //     name: "john d.",
-        //     productID: "123",
-        //     content: content
-        //   },
-        //   success: function(x) {
-        //     console.log(x);
-        //   }
-        // });
       });
 
       $(document).on("click", ".btn", async function() {
@@ -142,27 +156,45 @@
       function appendData(data) {
         data.forEach(element => {
           $("#questions").append(
-            `<div id=${element._id} class="row p-2">
-              <div class="col-2 text-center"><button class="btn" data-count=1 data-objid=${
-                element._id
-              }>Up</button><div class="points">${
-              element.points
-            }</div><button class="btn" data-count=2 data-objID=${
-              element._id
-            }>Down</button></div>
-                <div class="col-10">
-                  <div class="row">
-                    <div class="col-2">QUESTION</div>
-                    <div class="col-10"><h2>${element.content}</h2>
-                      <small class="float-right answer-question">answer this question</small>
+            `<div id=${element._id} class="row p-2 ui segment">
+              <div class="col-2 text-center">
+                <button class="btn" data-count=1 data-objid=${element._id}>
+                 <i class="fas fa-arrow-up"></i>
+                </button>
+                <div class="points">${element.points}</div>
+                <button class="btn" data-count=2 data-objID=${element._id}>
+                  <i class="fas fa-arrow-down"></i>
+                </button>
+              </div>
+              <div class="col-10 border-left p-2">
+                <div class="row">
+                  <div class="col-2 text-center">QUESTION</div>
+                  <div class="col-10"><p>${element.content}</p>
+                    <div class="answer-question"><small class="float-right">answer this question</small>
+                      <form class="answer-form d-none">
+                        <div class="form-group">
+                          <label for="question">Answer</label>
+                          <textarea
+                            type="text"
+                            id="form-content"
+                            class="form-control"
+                            id="name"
+                            placeholder="John D."
+                          ></textarea>
+                        </div>
+                        <button type="button" data-id="${
+                          element._id
+                        }" class="form-sub btn-primary">Submit</button>
+                        </form>
                       </div>
-                    
-                  </div>
-                  <div class="row">
-                    <div class="col-2">ANSWER</div>
-                    <div class="col-10 answers"></div>
-                  </div>
+                    </div>
+
                 </div>
+                <div class="row">
+                  <div class="col-2 text-center">ANSWER</div>
+                  <div class="col-10 answers"></div>
+                </div>
+              </div>
             </div>`
           );
           element.answers.forEach(e => {
